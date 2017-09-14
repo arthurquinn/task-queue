@@ -27,9 +27,11 @@ test: $(GTEST_TARGET)
 
 
 $(STATLIB): $(OBJ)
+	@mkdir -p $(@D)
 	ar -rcs $@ $^
 
 $(BIN)/%.o: $(SRC)/%.cpp
+	@mkdir -p $(@D)
 	$(CC) -c $^ -I$(INCLUDE) -o $@ $(CFLAGS)
 
 $(GTEST_TARGET): $(GTEST_SRC) $(GTEST_LIB) $(STATLIB)
