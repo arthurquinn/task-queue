@@ -25,6 +25,7 @@ private:
   void * _raw_data;
   unsigned int _raw_data_len;
   unsigned char _priority;
+  unsigned long _push_index;
   std::string _filepath;
 
   // Reconstructs a QueueItem from a binary file
@@ -33,22 +34,10 @@ private:
 
   // Writes a QueueItem to a binary file that can later be used to reconstruct the QueueItem
   // filepath: the directory that the queue_item will be written to (should be the same directory as all other queue_items in the queue)
-  int write(const std::string& save_dir);
+  int write(const std::string& save_dir, const unsigned long push_index);
 
   // Removes the save file associated with this queue_item
   int remove();
-
-  // Set the _is_enqueued flag for this queue_item to true
-  // flag is so the queue_item may only be enqueued once
-  void set_enqueued();
-
-  // Comparator to be used in the std::priority_queue
-  struct QueueItemComparator {
-
-    // function that returns the QueueItem with the higher priority
-    bool operator()(const QueueItem& a, const QueueItem& b);
-
-  };
 
 public:
 

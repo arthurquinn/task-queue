@@ -35,6 +35,7 @@ const int QueueItem::priority() const {
 // PRIVATE MEMBERS
 
 int QueueItem::load(const std::string& save_file) {
+  _is_enqueued = true;
   int retval = 0;
   char * memblock;
   std::streampos size;
@@ -51,10 +52,12 @@ int QueueItem::load(const std::string& save_file) {
       // construct QueueItem
       unsigned long * id = reinterpret_cast<unsigned long *>(memblock);
       if (*id == QUEUE_ITEM_ID) {
-        unsigned char * p = reinterpret_cast<unsigned char *>(memblock+sizeof(unsigned long));
-        unsigned int * len = reinterpret_cast<unsigned int *>(memblock+sizeof(unsigned long)+sizeof(unsigned char));
-        _raw_data = reinterpret_cast<void *>(memblock+sizeof(unsigned long)+sizeof(unsigned char)+sizeof(unsigned int));
+        unsigned char * p = reinterpret_cast<unsigned char *>((memblock = memblock+sizeof(unsigned long)));
+        unsigned long * pidx = reinterpret_cast<unsigned long *>((memblock = memblock+sizeof(unsigned char)));
+        unsigned int * len = reinterpret_cast<unsigned int *>((memblock = memblock+sizeof(unsigned long)));
+        _raw_data = reinterpret_cast<void *>((memblock = memblock+sizeof(unsigned int)));
         _priority = *p;
+        _push_index = *pidx;
         _raw_data_len = *len;
         _filepath = save_file;
       } else {
@@ -70,8 +73,10 @@ int QueueItem::load(const std::string& save_file) {
   return retval;
 }
 
-int QueueItem::write(const std::string& save_dir) {
+int QueueItem::write(const std::string& save_dir, const unsigned long push_index) {
   int retval = 0;
+  _push_index = push_index;
+  _is_enqueued = true;
   std::string filepath = gen_rand_filename(save_dir);
   std::ofstream outstream(filepath.c_str(), std::ios::out | std::ios::binary | std::ios::app);
   if (outstream.is_open()) {
@@ -79,6 +84,7 @@ int QueueItem::write(const std::string& save_dir) {
       unsigned long id = QUEUE_ITEM_ID;
       outstream.write(reinterpret_cast<const char *>(&id),sizeof(unsigned long));
       outstream.write(reinterpret_cast<const char *>(&_priority),sizeof(unsigned char));
+      outstream.write(reinterpret_cast<const char *>(&push_index),sizeof(unsigned long));
       outstream.write(reinterpret_cast<const char *>(&_raw_data_len),sizeof(unsigned int));
       outstream.write(reinterpret_cast<const char *>(_raw_data),_raw_data_len);
     } catch (const std::exception& e) {
@@ -98,12 +104,4 @@ int QueueItem::remove() {
     _filepath.clear();
   }
   return retval;
-}
-
-void QueueItem::set_enqueued() {
-  _is_enqueued = true;
-}
-
-bool QueueItem::QueueItemComparator::operator()(const QueueItem& a, const QueueItem& b) {
-  return a._priority < b._priority;
 }

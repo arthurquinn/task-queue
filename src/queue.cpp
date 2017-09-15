@@ -1,5 +1,13 @@
 #include "queue.h"
 
+Queue::QueueItemComparator::QueueItemComparator(const Queue& queue) : _queue(queue) { }
+
+bool Queue::QueueItemComparator::operator()(const QueueItem& a, const QueueItem& b) {
+  return a.priority() == b.priority() ? 
+    (a._push_index - _queue._push_cursor) > (b._push_index - _queue._push_cursor) : 
+    a.priority() < b.priority();
+}
+
 // PRIVATE FUNCTIONS
 
 std::vector<std::string> Queue::scan_qitems() {
@@ -29,7 +37,8 @@ std::vector<std::string> Queue::scan_qitems() {
 // PUBLIC FUNCTIONS
 
 Queue::Queue(unsigned int max_len, const std::string& reconstruct_dir)
-  : _pqueue(new pqueue_type()) {
+  : _pqueue(new queue_t(QueueItemComparator(*this))) {
+  _push_cursor = 0;
   _max_len = max_len;
   _reconstruct_dir = reconstruct_dir;
   std::vector<std::string> qitem_files = scan_qitems();
@@ -54,12 +63,11 @@ const int Queue::enqueue(QueueItem& queue_item) {
     strm << "item is already enqueued";
     throw std::logic_error(strm.str());
   }
-  int retval = queue_item.write(_reconstruct_dir);
+  _pqueue->push(queue_item);
+  int retval = queue_item.write(_reconstruct_dir, _push_cursor++);
   if (retval > 0) {
     retval = QUEUE_ERROR_WRITING_ITEM;
   }
-  queue_item.set_enqueued();
-  _pqueue->push(queue_item);
   return retval;
 }
 

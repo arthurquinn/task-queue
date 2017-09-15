@@ -19,11 +19,21 @@
 class Queue {
 
 private:
+  class QueueItemComparator {
+    friend class Queue;
+    friend class QueueItem;
+  private:
+    const Queue& _queue;
+  public:
+    QueueItemComparator(const Queue& queue);
+    bool operator()(const QueueItem& a, const QueueItem& b);
+  };
 
-  typedef std::priority_queue<QueueItem, std::vector<QueueItem>, QueueItem::QueueItemComparator> pqueue_type;
+  typedef std::priority_queue<QueueItem, std::vector<QueueItem>, QueueItemComparator> queue_t;
 
+  unsigned long _push_cursor;
   unsigned int _max_len;
-  pqueue_type * _pqueue;
+  queue_t * _pqueue;
   std::string _reconstruct_dir;
 
   // private helper to scan a directory for saved queue_item files
