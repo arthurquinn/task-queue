@@ -32,20 +32,21 @@ private:
 
   typedef std::priority_queue<QueueItem, std::vector<QueueItem>, QueueItemComparator> queue_t;
 
+  const std::string _reconstruct_dir;
+  const unsigned int _max_len;
+  const QueueItemComparator comparator;
+  queue_t _pqueue;
   unsigned long _push_cursor;
-  unsigned int _max_len;
-  queue_t * _pqueue;
-  std::string _reconstruct_dir;
 
   // private helper to scan a directory for saved queue_item files
-  std::vector<std::string> scan_qitems();
+  const std::vector<std::string> scan_qitems() const;
 
 public:
 
   // Instantiate a Queue with a maximum length that will store and retrieve reconstruction files from reconstruct_dir
   // max_len: the maximum length of the queue
   // reconstruct_dir: the directory that all .qi queue_item files will be saved to and read from
-  Queue(unsigned int max_len, const std::string& reconstruct_dir);
+  Queue(const unsigned int max_len, const std::string& reconstruct_dir);
 
   // destructor
   ~Queue();

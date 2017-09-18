@@ -12,7 +12,7 @@ bool Queue::QueueItemComparator::operator()(const QueueItem& a, const QueueItem&
 
 // PRIVATE FUNCTIONS
 
-std::vector<std::string> Queue::scan_qitems() {
+const std::vector<std::string> Queue::scan_qitems() const {
   int dir_err = 0;
   std::vector<std::string> qitem_vector;
   DIR * dir = opendir(_reconstruct_dir.c_str());
@@ -38,11 +38,13 @@ std::vector<std::string> Queue::scan_qitems() {
 
 // PUBLIC FUNCTIONS
 
-Queue::Queue(unsigned int max_len, const std::string& reconstruct_dir)
-  : _pqueue(new queue_t(QueueItemComparator(*this))) {
+Queue::Queue(const unsigned int max_len, const std::string& reconstruct_dir) :
+  _reconstruct_dir(reconstruct_dir),
+  _max_len(max_len),
+  comparator(*this),
+  _pqueue(comparator)
+{
   _push_cursor = 0;
-  _max_len = max_len;
-  _reconstruct_dir = reconstruct_dir;
   std::vector<std::string> qitem_files = scan_qitems();
 
   // Foreach queue_item file, try loading the saved queue_item into the queue
@@ -50,18 +52,18 @@ Queue::Queue(unsigned int max_len, const std::string& reconstruct_dir)
   for (it = qitem_files.begin(); it < qitem_files.end(); it++) {
     QueueItem qi;
     if (qi.load(*it) == 0) {
-      _pqueue->push(qi);
+      _pqueue.push(qi);
     }
   }
 }
 
 Queue::~Queue() {
-  delete _pqueue;
+  // delete _pqueue;
 }
 
 const int Queue::enqueue(QueueItem& queue_item) {
   std::stringstream strm;
-  if (_pqueue->size() >= _max_len) {
+  if (_pqueue.size() >= _max_len) {
     strm << "queue has reached maximum size: " << _max_len;
     throw std::length_error(strm.str());
   }
@@ -69,7 +71,7 @@ const int Queue::enqueue(QueueItem& queue_item) {
     strm << "item is already enqueued";
     throw std::logic_error(strm.str());
   }
-  _pqueue->push(queue_item);
+  _pqueue.push(queue_item);
   int retval = queue_item.write(_reconstruct_dir, _push_cursor++);
   if (retval > 0) {
     retval = QUEUE_ERROR_WRITING_ITEM;
@@ -78,27 +80,27 @@ const int Queue::enqueue(QueueItem& queue_item) {
 }
 
 const QueueItem& Queue::peek() const {
-  if (_pqueue->empty()) {
+  if (_pqueue.empty()) {
     throw std::length_error(std::string("cannot peek an empty queue"));
   } else {
-    return _pqueue->top();
+    return _pqueue.top();
   }
 }
 
 const int Queue::size() const {
-  return _pqueue->size();
+  return _pqueue.size();
 }
 
 const int Queue::dequeue() {
   int retval = 0;
-  if (_pqueue->empty()) {
+  if (_pqueue.empty()) {
     throw std::length_error(std::string("cannot dequeue an empty queue"));
   } else {
-    QueueItem item = _pqueue->top();
+    QueueItem item = _pqueue.top();
     if (item.remove() != 0) {
       retval = QUEUE_ERROR_REMOVING_ITEM;
     }
-    _pqueue->pop();
+    _pqueue.pop();
   }
   return retval;
 }
