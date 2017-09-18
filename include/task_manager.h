@@ -4,12 +4,12 @@
 #include <cstring>
 
 #include "queue.h"
-#include "dispatch.h"
+#include "dispatcher.h"
 #include "queue_item.h"
 
 class TaskManager {
 private:
-  Dispatch dispatch;
+  Dispatcher dispatcher;
   Queue queue;
 public:
   

@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 
 CC=g++
-CFLAGS=-std=c++98 -pedantic -Wall -g
+CFLAGS=-std=c++98 -pedantic -Wall -g -pthread
 
 STATLIB=lib/recoverable_queue.a
 
@@ -9,7 +9,7 @@ SRC=src
 INCLUDE=include
 BIN=bin
 
-OBJ=$(BIN)/queue.o $(BIN)/queue_item.o $(BIN)/utils.o $(BIN)/dispatch.o $(BIN)/task_manager.o
+OBJ=$(BIN)/queue.o $(BIN)/queue_item.o $(BIN)/utils.o $(BIN)/dispatcher.o $(BIN)/task_manager.o
 
 GTEST_TARGET1=gtests/main_test
 GTEST_SRC1=gtests/src/main_test.cpp

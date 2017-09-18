@@ -16,7 +16,7 @@ QueueItem::QueueItem() {
 }
 
 QueueItem::~QueueItem() {
-
+  /// TODO: raw data pointer needs to be freed
 }
 
 const void * QueueItem::data() const {
