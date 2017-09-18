@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <climits>
 #include "queue.h"
 #include "queue_item.h"
 
@@ -34,9 +35,9 @@ class QueueTest : public ::testing::Test {
     // set up sample datas
     sd = new sample_data[QUEUE_LEN];
     for (int i = 0; i < QUEUE_LEN; i++) {
-      sd[i].x = (i + 1) * i;
-      sd[i].y = (i + 2) * i;
-      sd[i].z = (i + 3) * i;
+      sd[i].x = i * 10;
+      sd[i].y = i * 10;
+      sd[i].z = i * 10;
     }
 
     // set up queue items
@@ -141,6 +142,34 @@ TEST_F(QueueTest, QueueSameItemTwiceTest) {
 
   test_queue->enqueue(item);
   EXPECT_THROW(test_queue->enqueue(item), std::exception);
+}
+
+TEST_F(QueueTest, LoadInSameOrderAsEnqueuedTest) {
+  Queue queue(10, "tmp");
+  for (int i = 0; i < 10; i++) {
+    int priority = i < 5 ? 0 : 1;
+    QueueItem qi(priority, &sd[i], sizeof(struct sample_data));
+    queue.enqueue(qi);
+  }
+
+  Queue loaded_queue(10, "tmp");
+  int push_index = -1;
+  int priority = INT_MAX;
+  for (int i = 0; i < 10; i++) {
+    QueueItem top = loaded_queue.peek();
+    int item_priority = static_cast<int>(top.priority());
+    int item_push_index = static_cast<int>(top.push_index());
+    EXPECT_LE(item_priority, priority);
+    if (item_priority != priority) {
+      push_index = -1;
+    }
+    EXPECT_GT(item_push_index, push_index);
+    priority = item_priority;
+    push_index = item_push_index;
+    loaded_queue.dequeue();
+  }
+
+  system("rm -rf tmp");
 }
 
 }  // namespace

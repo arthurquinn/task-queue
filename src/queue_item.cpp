@@ -28,8 +28,12 @@ const std::string& QueueItem::filepath() const {
   return _filepath;
 }
 
-const int QueueItem::priority() const {
+const unsigned char QueueItem::priority() const {
   return _priority;
+}
+
+const unsigned long QueueItem::push_index() const {
+  return _push_index;
 }
 
 // PRIVATE MEMBERS

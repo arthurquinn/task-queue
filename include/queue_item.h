@@ -60,7 +60,9 @@ public:
   const std::string& filepath() const;
 
   // Returns the specified priority for this queue_item
-  const int priority() const;
+  const unsigned char priority() const;
+
+  const unsigned long push_index() const;
 
 };
 
