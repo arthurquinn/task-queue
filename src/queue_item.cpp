@@ -1,5 +1,4 @@
 #include "queue_item.h"
-
 // PUBLIC MEMBERS
 
 QueueItem::QueueItem(unsigned char priority, void * raw_data, unsigned int raw_data_len) {
@@ -46,6 +45,8 @@ int QueueItem::load(const std::string& save_file) {
   _is_enqueued = true;
   int retval = 0;
   char * memblock;
+  char * saveptr;
+  bool alloc = false;
   std::streampos size;
   std::ifstream instream(save_file.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
   if (instream.is_open()) {
@@ -54,6 +55,8 @@ int QueueItem::load(const std::string& save_file) {
       // read into memblock
       size = instream.tellg();
       memblock = new char[size];
+      alloc = true;
+      saveptr = memblock;
       instream.seekg(0, std::ios::beg);
       instream.read(memblock,size);
 
@@ -63,21 +66,27 @@ int QueueItem::load(const std::string& save_file) {
         unsigned char * p = reinterpret_cast<unsigned char *>((memblock = memblock+sizeof(unsigned long)));
         unsigned long * pidx = reinterpret_cast<unsigned long *>((memblock = memblock+sizeof(unsigned char)));
         unsigned int * len = reinterpret_cast<unsigned int *>((memblock = memblock+sizeof(unsigned long)));
-        _raw_data = reinterpret_cast<void *>((memblock = memblock+sizeof(unsigned int)));
+        void * tmp_raw = reinterpret_cast<void *>((memblock = memblock+sizeof(unsigned int)));
         _priority = *p;
         _push_index = *pidx;
         _raw_data_len = *len;
         _filepath = save_file;
+
+        // copy raw data
+        char * raw = new char[_raw_data_len];
+        std::memcpy(raw, tmp_raw, _raw_data_len);
+        _raw_data = raw;
       } else {
         retval = 1;
       }
-
     } catch (const std::exception& e) {
       retval = 1;
     }
-    delete memblock;
   } else {
     retval = 1;
+  }
+  if (alloc) {
+    delete [] saveptr;
   }
   return retval;
 }
