@@ -9,7 +9,7 @@ SRC=src
 INCLUDE=include
 BIN=bin
 
-OBJ=$(BIN)/queue.o $(BIN)/queue_item.o $(BIN)/utils.o
+OBJ=$(BIN)/queue.o $(BIN)/queue_item.o $(BIN)/utils.o $(BIN)/dispatch.o $(BIN)/task_manager.o
 
 GTEST_TARGET=gtests/main_test
 GTEST_SRC=gtests/src/main_test.cpp
