@@ -1,7 +1,7 @@
 #include "queue_item.h"
 // PUBLIC MEMBERS
 
-QueueItem::QueueItem(unsigned char priority, void * raw_data, unsigned int raw_data_len) {
+QueueItem::QueueItem(unsigned char priority, const void * raw_data, unsigned int raw_data_len) {
   _is_enqueued = false;
   _priority = priority;
   _raw_data = raw_data;

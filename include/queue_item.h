@@ -23,7 +23,7 @@ friend class Queue;
 private:
 
   bool _is_enqueued;
-  void * _raw_data;
+  const void * _raw_data;
   unsigned int _raw_data_len;
   unsigned char _priority;
   unsigned long _push_index;
@@ -46,7 +46,7 @@ public:
   // priority: value 0-255 for the priority of this item within the queue
   // raw_data: pointer to raw data
   // raw_data_len: length of the raw data in bytes
-  QueueItem(unsigned char priority, void * raw_data, unsigned int raw_data_len);
+  QueueItem(unsigned char priority, const void * raw_data, unsigned int raw_data_len);
 
   // initializes an empty QueueItem
   QueueItem();

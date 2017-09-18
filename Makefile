@@ -11,8 +11,10 @@ BIN=bin
 
 OBJ=$(BIN)/queue.o $(BIN)/queue_item.o $(BIN)/utils.o $(BIN)/dispatch.o $(BIN)/task_manager.o
 
-GTEST_TARGET=gtests/main_test
-GTEST_SRC=gtests/src/main_test.cpp
+GTEST_TARGET1=gtests/main_test
+GTEST_SRC1=gtests/src/main_test.cpp
+GTEST_TARGET2=gtests/task_manager_test
+GTEST_SRC2=gtests/src/task_manager_test.cpp
 GTEST_INCLUDE=gtests/include
 GTEST_LIB=gtests/lib/libgtest.a
 GTEST_FLAGS=-isystem $(GTEST_INCLUDE) -pthread -I$(INCLUDE)
@@ -22,8 +24,9 @@ all: $(STATLIB)
 
 # make test compiles the test cases into a test executable
 # must have the googletest library installed on your machine in order for these to work
-test: $(GTEST_TARGET)
+test: $(GTEST_TARGET1) $(GTEST_TARGET2)
 	cd gtests && ./main_test
+	cd gtests && ./task_manager_test
 
 
 $(STATLIB): $(OBJ)
@@ -34,7 +37,10 @@ $(BIN)/%.o: $(SRC)/%.cpp
 	@mkdir -p $(@D)
 	$(CC) -c $^ -I$(INCLUDE) -o $@ $(CFLAGS)
 
-$(GTEST_TARGET): $(GTEST_SRC) $(GTEST_LIB) $(STATLIB)
+$(GTEST_TARGET1): $(GTEST_SRC1) $(GTEST_LIB) $(STATLIB)
+	$(CC) $^ -o $@ $(GTEST_FLAGS)
+
+$(GTEST_TARGET2): $(GTEST_SRC2) $(GTEST_LIB) $(STATLIB)
 	$(CC) $^ -o $@ $(GTEST_FLAGS)
 
 clean:
