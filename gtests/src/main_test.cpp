@@ -71,20 +71,20 @@ class QueueTest : public ::testing::Test {
 // simply runs through and make sure that the enqueues are successful
 TEST_F(QueueTest, EnqueueTest) {
   for (int i = 0; i < QUEUE_LEN; i++) {
-    test_queue->enqueue(*items[i]);
+    test_queue->enqueue(items[i]);
   }
 }
 
 // test enqueueing more items than max length of queue
 TEST_F(QueueTest, EnqueueOverflowTest) {
   for (int i = 0; i < QUEUE_LEN; i++) {
-    test_queue->enqueue(*items[i]);
+    test_queue->enqueue(items[i]);
   }
 
   struct sample_data data;
   QueueItem item(0, &data, sizeof(struct sample_data));
 
-  EXPECT_THROW(test_queue->enqueue(item), std::exception);
+  EXPECT_THROW(test_queue->enqueue(&item), std::exception);
 }
 
 // test peeking an empty queue
@@ -104,12 +104,12 @@ TEST_F(QueueTest, PriorityTest) {
   QueueItem middle(150, &data, sizeof(struct sample_data));
   QueueItem lowest(0, &data, sizeof(struct sample_data));
 
-  test_queue->enqueue(middle);
-  test_queue->enqueue(highest);
-  test_queue->enqueue(lowest);
+  test_queue->enqueue(&middle);
+  test_queue->enqueue(&highest);
+  test_queue->enqueue(&lowest);
 
-  QueueItem top = test_queue->peek();
-  EXPECT_EQ(255, top.priority());
+  const QueueItem* top = test_queue->peek();
+  EXPECT_EQ(255, top->priority());
 }
 
 // ensure queue loads from binary files properly
@@ -122,8 +122,8 @@ TEST_F(QueueTest, LoadTest) {
 TEST_F(QueueTest, LoadCorrectDataTest) {
   Queue queue(10, "gtest_queue_items");
 
-  QueueItem top = queue.peek();
-  struct sample_data * data = (struct sample_data *)top.data();
+  const QueueItem* top = queue.peek();
+  struct sample_data * data = (struct sample_data *)top->data();
 
   EXPECT_EQ(90, data->x);
   EXPECT_EQ(99, data->y);
@@ -140,8 +140,8 @@ TEST_F(QueueTest, QueueSameItemTwiceTest) {
   struct sample_data data;
   QueueItem item(100, &data, sizeof(struct sample_data));
 
-  test_queue->enqueue(item);
-  EXPECT_THROW(test_queue->enqueue(item), std::exception);
+  test_queue->enqueue(&item);
+  EXPECT_THROW(test_queue->enqueue(&item), std::exception);
 }
 
 TEST_F(QueueTest, LoadInSameOrderAsEnqueuedTest) {
@@ -149,16 +149,16 @@ TEST_F(QueueTest, LoadInSameOrderAsEnqueuedTest) {
   for (int i = 0; i < 10; i++) {
     int priority = i < 5 ? 0 : 1;
     QueueItem qi(priority, &sd[i], sizeof(struct sample_data));
-    queue.enqueue(qi);
+    queue.enqueue(&qi);
   }
 
   Queue loaded_queue(10, "tmp");
   int push_index = -1;
   int priority = INT_MAX;
   for (int i = 0; i < 10; i++) {
-    QueueItem top = loaded_queue.peek();
-    int item_priority = static_cast<int>(top.priority());
-    int item_push_index = static_cast<int>(top.push_index());
+    const QueueItem* top = loaded_queue.peek();
+    int item_priority = static_cast<int>(top->priority());
+    int item_push_index = static_cast<int>(top->push_index());
     EXPECT_LE(item_priority, priority);
     if (item_priority != priority) {
       push_index = -1;

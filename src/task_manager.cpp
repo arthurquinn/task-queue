@@ -4,11 +4,13 @@ TaskManager::TaskManager(const unsigned int max_tasks, const std::string& recove
 
 }
 
-
+const int TaskManager::stage_task() {
+  return 1;
+}
 
 const int TaskManager::push_task(const unsigned char priority, const char * command) {
   QueueItem * item = new QueueItem(priority, command, strlen(command) + 1);
-  queue.enqueue(*item);
+  queue.enqueue(item);
 
   return 1;
 }

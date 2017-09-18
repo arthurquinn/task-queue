@@ -27,10 +27,10 @@ private:
   public:
     QueueItemComparator(const Queue& queue);
     ~QueueItemComparator();
-    bool operator()(const QueueItem& a, const QueueItem& b);
+    bool operator()(const QueueItem * a, const QueueItem * b);
   };
 
-  typedef std::priority_queue<QueueItem, std::vector<QueueItem>, QueueItemComparator> queue_t;
+  typedef std::priority_queue<QueueItem*, std::vector<QueueItem*>, QueueItemComparator> queue_t;
 
   const std::string _reconstruct_dir;
   const unsigned int _max_len;
@@ -53,18 +53,19 @@ public:
 
   // Enqueue a QueueItem into the queue and saves it to a queue_item .qi file
   // throws: std::length_error if the queue is full
-  const int enqueue(QueueItem& queue_item);
+  const int enqueue(QueueItem* queue_item);
 
   // Returns a reference to the QueueItem at the top of the queue without removing it from the queue
   // throws: std::length_error if the queue is empty
-  const QueueItem& peek() const;
+  const QueueItem* peek() const;
 
   // Returns the current size of the queue
   const int size() const;
 
   // Dequeue a QueueItem from the queue and delete its corresponding queue_item .qi file
   // throws: std::length_error if the queue is empty
-  const int dequeue();
+  // The Queue does not delete queue_items after they are dequeued, ensure user code is deleting the queue_items
+  const QueueItem* dequeue();
 
 };
 

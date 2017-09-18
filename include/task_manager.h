@@ -18,6 +18,9 @@ public:
   // reconstruct_dir: the directory that recovery files are stored
   TaskManager(const unsigned int max_tasks, const std::string& reconstruct_dir);
 
+  // Move a queue_item onto the dispatch stage to begin running
+  const int stage_task();
+
   // Enqueues a new task into the task_manager
   // priority: the priority of the task
   // command: the command to be executed
