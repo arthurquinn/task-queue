@@ -75,6 +75,7 @@ int QueueItem::load(const std::string& save_file) {
     } catch (const std::exception& e) {
       retval = 1;
     }
+    delete memblock;
   } else {
     retval = 1;
   }
