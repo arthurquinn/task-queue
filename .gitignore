@@ -31,3 +31,6 @@
 *.out
 *.app
 gtests/main_test
+
+# VS Code
+.vscode
