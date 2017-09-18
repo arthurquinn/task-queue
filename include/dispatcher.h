@@ -19,6 +19,7 @@ typedef struct task_entry {
 class Dispatcher {
 private:
   std::vector<TaskEntry> stage;
+  void start_in_thread(TaskEntry te);
 public:
   Dispatcher();
   const int count() const;
