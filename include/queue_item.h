@@ -50,6 +50,9 @@ public:
   // initializes an empty QueueItem
   QueueItem();
 
+  // destructor
+  ~QueueItem();
+
   // get pointer to raw data
   const void * data() const;
 

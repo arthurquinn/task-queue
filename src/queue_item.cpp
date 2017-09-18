@@ -16,6 +16,10 @@ QueueItem::QueueItem() {
   _raw_data_len = 0;
 }
 
+QueueItem::~QueueItem() {
+
+}
+
 const void * QueueItem::data() const {
   return _raw_data;
 }

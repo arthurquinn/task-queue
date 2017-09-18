@@ -26,6 +26,7 @@ private:
     const Queue& _queue;
   public:
     QueueItemComparator(const Queue& queue);
+    ~QueueItemComparator();
     bool operator()(const QueueItem& a, const QueueItem& b);
   };
 
@@ -45,6 +46,9 @@ public:
   // max_len: the maximum length of the queue
   // reconstruct_dir: the directory that all .qi queue_item files will be saved to and read from
   Queue(unsigned int max_len, const std::string& reconstruct_dir);
+
+  // destructor
+  ~Queue();
 
   // Enqueue a QueueItem into the queue and saves it to a queue_item .qi file
   // throws: std::length_error if the queue is full

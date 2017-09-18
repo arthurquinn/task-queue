@@ -2,6 +2,8 @@
 
 Queue::QueueItemComparator::QueueItemComparator(const Queue& queue) : _queue(queue) { }
 
+Queue::QueueItemComparator::~QueueItemComparator() { }
+
 bool Queue::QueueItemComparator::operator()(const QueueItem& a, const QueueItem& b) {
   return a.priority() == b.priority() ? 
     (a._push_index - _queue._push_cursor) > (b._push_index - _queue._push_cursor) : 
@@ -51,6 +53,10 @@ Queue::Queue(unsigned int max_len, const std::string& reconstruct_dir)
       _pqueue->push(qi);
     }
   }
+}
+
+Queue::~Queue() {
+  delete _pqueue;
 }
 
 const int Queue::enqueue(QueueItem& queue_item) {
