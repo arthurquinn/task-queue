@@ -40,11 +40,13 @@ const unsigned long QueueItem::push_index() const {
   return _push_index;
 }
 
+#include <iostream>
 int QueueItem::remove() {
   int retval = std::remove(_filepath.c_str());
   if (retval == 0) {
     _filepath.clear();
   }
+  std::cout << "REMOVING" << std::endl;
   return retval;
 }
 

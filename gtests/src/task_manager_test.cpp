@@ -16,7 +16,6 @@ class TaskManagerTest : public ::testing::Test {
   TaskManagerTest() : task_manager(20, "task_item_tmp") {
     // You can do set-up work for each test here.
 
-    task_manager.push_task(100, "./sample_udp_message/udp_message");
   }
 
   virtual ~TaskManagerTest() {
@@ -40,13 +39,25 @@ class TaskManagerTest : public ::testing::Test {
   // Objects declared here can be used by all tests in the test case for Foo.
 };
 
-TEST_F(TaskManagerTest, RunSingleTaskTest) {
+TEST_F(TaskManagerTest, DoAllTasksInDirectory) {
 
-  while (1) {
-    task_manager.run();
+  system("mkdir -p do_all_tmp");
+  system("cp -p task_manager_test_items/* do_all_tmp/");
+
+  TaskManager tm(20, "do_all_tmp");
+
+  while (tm.has_tasks()) {
+    tm.run();
     sleep(1);
-    task_manager.push_task(5, "./sample_udp_message/udp_message");
   }
+
+  system("rm -rf do_all_tmp/");
+
+  // while (true) {
+  //   task_manager.run();
+  //   sleep(1);
+  //   task_manager.push_task(5, "./sample_udp_message/udp_message");
+  // }
 }
 
 }  // namespace

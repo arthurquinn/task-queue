@@ -19,6 +19,7 @@
 #include "utils.h"
 
 typedef int socket_t;
+typedef int port_t;
 
 typedef struct task_entry {
   QueueItem* queue_item;
@@ -30,7 +31,7 @@ private:
   unsigned int current_task_id;
   std::vector<TaskEntry> stage;
   socket_t udp_socket;
-
+  port_t udp_port;
   // Remove a TaskEntry from the stage by its task_id and delete its corresponing QueueItem
   // This method frees room for more QueueItems to be dispatched from the Queue
   void remove(const unsigned int tid);

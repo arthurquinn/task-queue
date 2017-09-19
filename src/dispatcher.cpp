@@ -24,15 +24,22 @@ Dispatcher::Dispatcher() {
   }
 
   struct sockaddr_in sock_addr;
-  memset(reinterpret_cast<char*>(&sock_addr), 0, sizeof(struct sockaddr_in));
+  socklen_t len = sizeof(sock_addr);
+  memset(reinterpret_cast<char*>(&sock_addr), 0, len);
   sock_addr.sin_family = AF_INET;
   sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   sock_addr.sin_port = htons(0);
 
-  if (bind(udp_socket, reinterpret_cast<struct sockaddr*>(&sock_addr), sizeof(struct sockaddr_in)) < 0) {
+
+  if (bind(udp_socket, reinterpret_cast<struct sockaddr*>(&sock_addr), len) < 0) {
     throw std::runtime_error("task manager: could not bind udp_socket");
   }
 
+  if (getsockname(udp_socket, reinterpret_cast<struct sockaddr*>(&sock_addr), &len) < 0) {
+    throw std::runtime_error("task manager: unable to retrieve the established port number from socket info");
+  }
+  
+  udp_port = ntohs(sock_addr.sin_port);
   current_task_id = 0;
 }
 
@@ -68,7 +75,7 @@ void Dispatcher::dispatch(QueueItem* item) {
   const char* cmd = static_cast<const char*>(item->data());
 
   std::stringstream stream;
-  stream << cmd << " " << current_task_id << " &";
+  stream << cmd << " " << current_task_id << " " << udp_port << " &";
   std::string complete_cmd = stream.str();
   system(complete_cmd.c_str());
   std::cout << "dispatched: " << complete_cmd << std::endl;
