@@ -79,7 +79,7 @@ const int Queue::enqueue(QueueItem* queue_item) {
   return retval;
 }
 
-const QueueItem * Queue::peek() const {
+const QueueItem* Queue::peek() const {
   if (_pqueue.empty()) {
     throw std::length_error(std::string("cannot peek an empty queue"));
   } else {
@@ -91,8 +91,8 @@ const int Queue::size() const {
   return _pqueue.size();
 }
 
-const QueueItem * Queue::dequeue() {
-  QueueItem * item = NULL;
+QueueItem* Queue::dequeue() {
+  QueueItem* item = NULL;
   if (_pqueue.empty()) {
     throw std::length_error(std::string("cannot dequeue an empty queue"));
   } else {

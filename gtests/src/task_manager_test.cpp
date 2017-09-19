@@ -11,9 +11,10 @@ class TaskManagerTest : public ::testing::Test {
 
   TaskManager task_manager;
 
-  TaskManagerTest() : task_manager(100, "queue_item_tmp") {
+  TaskManagerTest() : task_manager(20, "task_item_tmp") {
     // You can do set-up work for each test here.
 
+    task_manager.push_task(100, "ls -l");
   }
 
   virtual ~TaskManagerTest() {
@@ -31,23 +32,16 @@ class TaskManagerTest : public ::testing::Test {
   virtual void TearDown() {
     // Code here will be called immediately after each test (right
     // before the destructor).
-    system("rm -rf queue_item_tmp");
+    system("rm -rf task_item_tmp");
   }
 
   // Objects declared here can be used by all tests in the test case for Foo.
 };
 
-// Tests that tasks are successfully added to the task manager
-TEST_F(TaskManagerTest, PushTaskTest) {
-  task_manager.push_task(1, "command 1");
-  task_manager.push_task(2, "command 2");
-  task_manager.push_task(3, "command 3");
-  task_manager.push_task(4, "command 4");
-  task_manager.push_task(5, "command 5");
-}
+TEST_F(TaskManagerTest, RunSingleTaskTest) {
+  task_manager.stage_task();
 
-TEST_F(TaskManagerTest, LoadTaskTest) {
-
+  system("sleep 15");
 }
 
 }  // namespace

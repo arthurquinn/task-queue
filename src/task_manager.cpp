@@ -8,7 +8,11 @@ const int TaskManager::stage_task() {
   if (queue.size() < 1) {
     throw std::length_error("task_manager: stage_task cannot stage from an empty queue");
   }
-
+  if (dispatcher.count() >= 4) {
+    throw std::length_error("task_manager: tried to stage a task to a full dispatcher");
+  }
+  QueueItem* item = queue.dequeue();
+  dispatcher.dispatch(item);
   return 0;
 }
 
