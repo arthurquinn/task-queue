@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <string>
 #include <dirent.h>
+#include <iostream>
 
 #include "queue_item.h"
 #include "utils.h"

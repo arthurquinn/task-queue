@@ -9,6 +9,8 @@ void Dispatcher::remove(const unsigned int tid) {
     if (te.task_id == tid) {
       stage.erase(it, it + 1);
       QueueItem* item = te.queue_item;
+      std::cout << "removed: " << item->filepath() << std::endl;
+      item->remove();
       delete item;
     }
   }

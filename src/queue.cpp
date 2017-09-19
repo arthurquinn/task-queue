@@ -76,6 +76,7 @@ const int Queue::enqueue(QueueItem* queue_item) {
   if (retval > 0) {
     retval = QUEUE_ERROR_WRITING_ITEM;
   }
+  std::cout << "enqueued: " + queue_item->filepath() << std::endl;
   return retval;
 }
 
@@ -97,9 +98,6 @@ QueueItem* Queue::dequeue() {
     throw std::length_error(std::string("cannot dequeue an empty queue"));
   } else {
     item = _pqueue.top();
-    if (item->remove() != 0) {
-      /// TODO: implement a warning that a queue item was not removed
-    }
     _pqueue.pop();
   }
   return item;
