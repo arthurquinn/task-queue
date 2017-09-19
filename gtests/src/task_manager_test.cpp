@@ -14,7 +14,7 @@ class TaskManagerTest : public ::testing::Test {
   TaskManagerTest() : task_manager(20, "task_item_tmp") {
     // You can do set-up work for each test here.
 
-    task_manager.push_task(100, "ls -l");
+    task_manager.push_task(100, "sleep 10 && ls -l");
   }
 
   virtual ~TaskManagerTest() {
