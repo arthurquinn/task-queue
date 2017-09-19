@@ -2,15 +2,31 @@
 #define TASK_MANAGER_H
 
 #include <cstring>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
 
 #include "queue.h"
 #include "dispatcher.h"
 #include "queue_item.h"
 
+#define UDP_PORT_NO 12950
+#define UDP_BUFFER_SIZE 2048
+
+typedef int socket_t;
+
+// Listen in a loop for messages received on the udp socket
+// This method listens in a thread and closes out processes that have written back their pids
+void* listen_udp_socket(void*);
+
 class TaskManager {
 private:
+  socket_t udp_socket;
   Dispatcher dispatcher;
   Queue queue;
+
+  friend void* listen_udp_socket(void*);
 public:
   
   // Creates a new task manager

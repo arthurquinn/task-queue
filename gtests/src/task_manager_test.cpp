@@ -41,7 +41,7 @@ class TaskManagerTest : public ::testing::Test {
 TEST_F(TaskManagerTest, RunSingleTaskTest) {
   task_manager.stage_task();
 
-  system("sleep 15");
+  std::cin.get();
 }
 
 }  // namespace
