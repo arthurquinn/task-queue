@@ -27,7 +27,7 @@ Dispatcher::Dispatcher() {
   memset(reinterpret_cast<char*>(&sock_addr), 0, sizeof(struct sockaddr_in));
   sock_addr.sin_family = AF_INET;
   sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  sock_addr.sin_port = htons(UDP_PORT_NO);
+  sock_addr.sin_port = htons(0);
 
   if (bind(udp_socket, reinterpret_cast<struct sockaddr*>(&sock_addr), sizeof(struct sockaddr_in)) < 0) {
     throw std::runtime_error("task manager: could not bind udp_socket");

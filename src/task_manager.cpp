@@ -4,12 +4,15 @@ TaskManager::TaskManager(const unsigned int max_tasks, const std::string& recove
 
 }
 
+const bool TaskManager::has_tasks() {
+  
+}
+
 
 void TaskManager::run() {
   dispatcher.check_cleanup();
   if (dispatcher.count() < 4 && queue.size() > 0) {
     QueueItem* item = queue.dequeue();
-    std::cout << "queue length: " << queue.size() << std::endl;
     dispatcher.dispatch(item);
   }
 }

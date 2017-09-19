@@ -18,6 +18,9 @@ public:
   // reconstruct_dir: the directory that recovery files are stored
   TaskManager(const unsigned int max_tasks, const std::string& reconstruct_dir);
 
+  // Determines if the task_manager has any tasks in the queue or in the dispatcher
+  const bool has_tasks();
+
   // Runs through a single iteration of the task manager
   // First checks if there are any available positions on the dispatcher stage
   // If there are, dequeue a queue item, start its task, and push it to the dispatcher stage

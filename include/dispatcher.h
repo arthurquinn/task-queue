@@ -2,7 +2,6 @@
 #define DISPATCHER_H
 
 #define STAGE_SIZE 4
-#define UDP_PORT_NO 12950
 #define UDP_BUFFER_SIZE 2048
 
 #include <vector>

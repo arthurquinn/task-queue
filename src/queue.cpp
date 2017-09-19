@@ -76,7 +76,6 @@ const int Queue::enqueue(QueueItem* queue_item) {
   if (retval > 0) {
     retval = QUEUE_ERROR_WRITING_ITEM;
   }
-  std::cout << "enqueued: " + queue_item->filepath() << std::endl;
   return retval;
 }
 
