@@ -5,7 +5,9 @@ void* thread_run(void* args) {
   QueueItem* qi = thread_args->queue_item;
   std::cout << static_cast<int>(qi->priority()) << std::endl;
 
-  system("sleep 10 && ls -l");
+  const char* cmd = static_cast<const char*>(qi->data());
+  std::cout << "about to execute cmd: " << cmd << std::endl;
+  system(cmd);
 
   delete thread_args;
   pthread_exit(NULL);
