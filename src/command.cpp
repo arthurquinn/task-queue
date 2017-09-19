@@ -14,11 +14,11 @@ const char * Command::to_stream() {
 }
 
 const unsigned int Command::extract_id(const char * stream) {
-
+  return 0;
 }
 
 const char * Command::extract_cmd(const char * stream) {
-  
+  return "";
 }
 
 Command::Command(const char * stream) : id(extract_id(stream)), cmd(extract_cmd(stream)) { }

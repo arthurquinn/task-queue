@@ -5,16 +5,16 @@ CFLAGS=-std=c++98 -pedantic -Wall -g -pthread
 
 STATLIB=lib/recoverable_queue.a
 
-SRC=src
+
 INCLUDE=include
 BIN=bin
 
-OBJ=$(BIN)/queue.o $(BIN)/queue_item.o $(BIN)/utils.o $(BIN)/dispatcher.o $(BIN)/task_manager.o
+SRC := $(wildcard src/*.cpp)
+OBJ := $(patsubst src/%.cpp,bin/%.o,$(SRC))
 
-GTEST_TARGET1=gtests/main_test
-GTEST_SRC1=gtests/src/main_test.cpp
-GTEST_TARGET2=gtests/task_manager_test
-GTEST_SRC2=gtests/src/task_manager_test.cpp
+
+GTEST_SRC := $(wildcard gtests/src/*.cpp)
+GTEST_TARGET := $(patsubst gtests/src/%.cpp,gtests/%,$(GTEST_SRC))
 GTEST_INCLUDE=gtests/include
 GTEST_LIB=gtests/lib/libgtest.a
 GTEST_FLAGS=-isystem $(GTEST_INCLUDE) -pthread -I$(INCLUDE)
@@ -24,7 +24,7 @@ all: $(STATLIB)
 
 # make test compiles the test cases into a test executable
 # must have the googletest library installed on your machine in order for these to work
-test: $(GTEST_TARGET1) $(GTEST_TARGET2)
+test: $(GTEST_TARGET)
 	cd gtests && ./main_test
 	cd gtests && ./task_manager_test
 
@@ -33,16 +33,13 @@ $(STATLIB): $(OBJ)
 	@mkdir -p $(@D)
 	ar -rcs $@ $^
 
-$(BIN)/%.o: $(SRC)/%.cpp
+$(OBJ): $(SRC)
 	@mkdir -p $(@D)
-	$(CC) -c $^ -I$(INCLUDE) -o $@ $(CFLAGS)
+	$(CC) -c $(patsubst bin/%.o,src/%.cpp,$@) -I$(INCLUDE) -o $@ $(CFLAGS)
 
-$(GTEST_TARGET1): $(GTEST_SRC1) $(GTEST_LIB) $(STATLIB)
-	$(CC) $^ -o $@ $(GTEST_FLAGS)
-
-$(GTEST_TARGET2): $(GTEST_SRC2) $(GTEST_LIB) $(STATLIB)
-	$(CC) $^ -o $@ $(GTEST_FLAGS)
+$(GTEST_TARGET): $(GTEST_SRC) $(GTEST_LIB) $(STATLIB)
+	$(CC) $(patsubst gtests/%,gtests/src/%.cpp,$@) -o $@ $(GTEST_FLAGS) $(filter-out %.cpp,$^)
 
 clean:
-	@rm -f $(GTEST_TARGET1) $(GTEST_TARGET2) $(STATLIB) bin/*.o
+	@rm -f $(GTEST_TARGET) $(STATLIB) bin/*.o
 

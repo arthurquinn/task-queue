@@ -30,7 +30,6 @@ Dispatcher::Dispatcher() {
   sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   sock_addr.sin_port = htons(0);
 
-
   if (bind(udp_socket, reinterpret_cast<struct sockaddr*>(&sock_addr), len) < 0) {
     throw std::runtime_error("task manager: could not bind udp_socket");
   }

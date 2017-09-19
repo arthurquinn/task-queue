@@ -13,6 +13,10 @@ private:
   // turn the command data into a stream for writing
   const char * to_stream();
 
+  const unsigned int extract_id(const char * stream);
+
+  const char * extract_cmd(const char * stream);
+
   // construct command from a stream read in from a file
   Command(const char * stream);
 
