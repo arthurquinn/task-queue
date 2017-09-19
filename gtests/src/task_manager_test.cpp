@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "task_manager.h"
 
+#include <unistd.h>
+
 namespace {
 
 // The fixture for testing class Foo.
@@ -14,7 +16,7 @@ class TaskManagerTest : public ::testing::Test {
   TaskManagerTest() : task_manager(20, "task_item_tmp") {
     // You can do set-up work for each test here.
 
-    task_manager.push_task(100, "sleep 10 && ls -l");
+    task_manager.push_task(100, "./sample_udp_message/udp_message");
   }
 
   virtual ~TaskManagerTest() {
@@ -39,9 +41,12 @@ class TaskManagerTest : public ::testing::Test {
 };
 
 TEST_F(TaskManagerTest, RunSingleTaskTest) {
-  task_manager.stage_task();
 
-  std::cin.get();
+  while (1) {
+    task_manager.run();
+    sleep(1);
+    task_manager.push_task(5, "./sample_udp_message/udp_message");
+  }
 }
 
 }  // namespace

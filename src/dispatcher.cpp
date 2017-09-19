@@ -1,27 +1,17 @@
 #include "dispatcher.h"
 
+// PRIVATE MEMBERS
 
-// FRIEND FUNCTION
-void* listen_udp_socket(void* args) {
-  Dispatcher* instance = static_cast<Dispatcher*>(args);
-  socket_t udp_socket = instance->udp_socket;
-
-  struct sockaddr_in remote_addr;
-  socklen_t remote_len = sizeof(struct sockaddr_in);
-  unsigned char buffer[UDP_BUFFER_SIZE];
-  int recvlen;
-
-  for (;;) {
-    std::cout << "listening for messages on port " << UDP_PORT_NO << std::endl;
-    recvlen = recvfrom(udp_socket, buffer, UDP_BUFFER_SIZE, 0, reinterpret_cast<struct sockaddr*>(&remote_addr), &remote_len);
-    std::cout << "received " << recvlen << " bytes" << std::endl;
-    if (recvlen > 0) {
-      buffer[recvlen] = 0;
-      std::cout << "received message: " << buffer << std::endl;
+void Dispatcher::remove(const unsigned int tid) {
+  std::vector<TaskEntry>::iterator it;
+  for (it = stage.begin(); it < stage.end(); it++) {
+    TaskEntry te = *it;
+    if (te.task_id == tid) {
+      stage.erase(it, it + 1);
+      QueueItem* item = te.queue_item;
+      delete item;
     }
   }
-
-  std::cout << "leaving listen_udp_socket" << std::endl;
 }
 
 // PUBLIC MEMBERS
@@ -41,13 +31,28 @@ Dispatcher::Dispatcher() {
     throw std::runtime_error("task manager: could not bind udp_socket");
   }
 
-  pthread_t thread;
-  pthread_attr_t thread_attr;
-  pthread_attr_init(&thread_attr);
-  pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
-  pthread_attr_setscope(&thread_attr, PTHREAD_SCOPE_SYSTEM);
-  pthread_create(&thread, &thread_attr, &listen_udp_socket, static_cast<void*>(this));
-  pthread_attr_destroy(&thread_attr);
+  current_task_id = 0;
+}
+
+void Dispatcher::check_cleanup() {
+  struct pollfd poll_fd;
+  poll_fd.fd = udp_socket;
+  poll_fd.events = POLLIN;
+  while (poll(&poll_fd, 1, 1) > 0) {
+    std::cout << "poll found input" << std::endl;
+    struct sockaddr_in remote_addr;
+    socklen_t remote_len = sizeof(struct sockaddr_in);
+    unsigned char buffer[UDP_BUFFER_SIZE];
+    int recvlen;
+    recvlen = recvfrom(udp_socket, buffer, UDP_BUFFER_SIZE, 0, reinterpret_cast<struct sockaddr*>(&remote_addr), &remote_len);
+    std::cout << "received " << recvlen << " bytes" << std::endl;
+    if (recvlen > 0) {
+      buffer[recvlen] = 0;
+      std::cout << "received message: " << buffer << std::endl;
+      const unsigned long tid = strtoui(reinterpret_cast<const char*>(buffer));
+      remove(tid);
+    }
+  }
 }
 
 const int Dispatcher::count() const {
@@ -59,8 +64,17 @@ void Dispatcher::dispatch(QueueItem* item) {
     throw std::length_error("dispatcher: maximum number of tasks dispatched reached");
   }
   const char* cmd = static_cast<const char*>(item->data());
-  system(cmd);
-  stage.push_back(item);
+
+  std::stringstream stream;
+  stream << cmd << " " << current_task_id << " &";
+  std::string complete_cmd = stream.str();
+  system(complete_cmd.c_str());
+  std::cout << "dispatched: " << complete_cmd << std::endl;
+
+  TaskEntry te;
+  te.queue_item = item;
+  te.task_id = current_task_id++;
+  stage.push_back(te);
 }
 
 Dispatcher::~Dispatcher() {

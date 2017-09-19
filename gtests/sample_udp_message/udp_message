@@ -1,3 +1,4 @@
 #!/bin/bash
 
-printf "Pid: $$" > /dev/udp/127.0.0.1/12950
+sleep 10
+printf $1 > /dev/udp/127.0.0.1/12950
