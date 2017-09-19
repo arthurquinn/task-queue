@@ -5,7 +5,7 @@ TaskManager::TaskManager(const unsigned int max_tasks, const std::string& recove
 }
 
 const bool TaskManager::has_tasks() {
-  
+  return dispatcher.count() > 0 || queue_item.size() > 0;
 }
 
 
