@@ -44,5 +44,5 @@ $(GTEST_TARGET2): $(GTEST_SRC2) $(GTEST_LIB) $(STATLIB)
 	$(CC) $^ -o $@ $(GTEST_FLAGS)
 
 clean:
-	@rm -f $(GTEST_TARGET) $(STATLIB) bin/*.o
+	@rm -f $(GTEST_TARGET1) $(GTEST_TARGET2) $(STATLIB) bin/*.o
 
