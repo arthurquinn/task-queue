@@ -1,3 +1,11 @@
+## TASK QUEUE ## 
+
+The task queue is deisgned to be simple and easy to use. Simply push a task with a priority onto the queue and once it is this tasks turn, it will run, and return a value to the task queue via a UDP socket. Once it is returned more tasks can be dispatched.
+
+### Dispatcher ###
+
+It is the dispatchers job to handle task execution. Whereas the primary purpose of the queue is to maintain the order in which tasks arrived, the dispatchers sole purpose is to make sure only a certain number of tasks are running at once (defined in code as 4). Once a task that the dispatcher sent out for execution returns to the dispatcher, the dispatcher will mark the tasks progress as complete or failed and pull the next task from a the priority queue.
+
 ### Recoverable Queue ###
 
 This queue was designed with the intention that its state can be restored after a program crash. As items are enqueued into this queue they will be written out to a binary .qi file. As they are dequeued these files will be removed. The queue is initialized with a maximum size and a reconstruct directory. All queue items belonging to a queue will be written out and read from the specified reconstruct directory. 
