@@ -41,5 +41,5 @@ $(GTEST_TARGET): $(GTEST_SRC) $(GTEST_LIB) $(STATLIB)
 	$(CC) $(patsubst gtests/%,gtests/src/%.cpp,$@) -o $@ $(GTEST_FLAGS) $(filter-out %.cpp,$^)
 
 clean:
-	@rm -f $(GTEST_TARGET) $(STATLIB) bin/*.o
+	@rm -f $(GTEST_TARGET1) $(GTEST_TARGET2) $(STATLIB) bin/*.o
 
