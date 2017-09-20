@@ -1,4 +1,5 @@
 #include "queue_item.h"
+
 // PUBLIC MEMBERS
 
 QueueItem::QueueItem(unsigned char priority, const void * raw_data, unsigned int raw_data_len) {
@@ -16,7 +17,7 @@ QueueItem::QueueItem() {
 }
 
 QueueItem::~QueueItem() {
-  /// TODO: raw data pointer needs to be freed
+  /// TODO: raw data pointer needs to be freed, should we handle or should user code?
 }
 
 const void * QueueItem::data() const {
@@ -37,6 +38,14 @@ const unsigned char QueueItem::priority() const {
 
 const unsigned long QueueItem::push_index() const {
   return _push_index;
+}
+
+int QueueItem::remove() {
+  int retval = std::remove(_filepath.c_str());
+  if (retval == 0) {
+    _filepath.clear();
+  }
+  return retval;
 }
 
 // PRIVATE MEMBERS
@@ -112,14 +121,6 @@ int QueueItem::write(const std::string& save_dir, const unsigned long push_index
     _filepath = filepath;
   } else {
     retval = 1;
-  }
-  return retval;
-}
-
-int QueueItem::remove() {
-  int retval = std::remove(_filepath.c_str());
-  if (retval == 0) {
-    _filepath.clear();
   }
   return retval;
 }

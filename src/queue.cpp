@@ -97,9 +97,6 @@ QueueItem* Queue::dequeue() {
     throw std::length_error(std::string("cannot dequeue an empty queue"));
   } else {
     item = _pqueue.top();
-    if (item->remove() != 0) {
-      /// TODO: implement a warning that a queue item was not removed
-    }
     _pqueue.pop();
   }
   return item;

@@ -4,16 +4,19 @@ TaskManager::TaskManager(const unsigned int max_tasks, const std::string& recove
 
 }
 
-const int TaskManager::stage_task() {
-  if (queue.size() < 1) {
-    throw std::length_error("task_manager: stage_task cannot stage from an empty queue");
+const bool TaskManager::has_tasks() {
+  std::cout << dispatcher.count() << std::endl;
+  std::cout << queue.size() << std::endl;
+  return dispatcher.count() > 0 || queue.size() > 0;
+}
+
+
+void TaskManager::run() {
+  dispatcher.check_cleanup();
+  if (dispatcher.count() < 4 && queue.size() > 0) {
+    QueueItem* item = queue.dequeue();
+    dispatcher.dispatch(item);
   }
-  if (dispatcher.count() >= 4) {
-    throw std::length_error("task_manager: tried to stage a task to a full dispatcher");
-  }
-  QueueItem* item = queue.dequeue();
-  dispatcher.dispatch(item);
-  return 0;
 }
 
 const int TaskManager::push_task(const unsigned char priority, const char * command) {

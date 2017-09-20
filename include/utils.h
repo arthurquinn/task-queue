@@ -6,6 +6,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sys/stat.h>
+#include <vector>
+#include <cstring>
+#include <stdexcept>
 
 const int create_dir(const std::string& dir);
 
@@ -15,5 +18,7 @@ std::string concat_filepath(const std::string& a, const std::string& b);
 
 // generates a random filename located in directory dir
 std::string gen_rand_filename(const std::string& dir);
+
+const unsigned int strtoui(const char * str);
 
 #endif

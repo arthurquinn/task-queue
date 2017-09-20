@@ -37,9 +37,6 @@ private:
   // filepath: the directory that the queue_item will be written to (should be the same directory as all other queue_items in the queue)
   int write(const std::string& save_dir, const unsigned long push_index);
 
-  // Removes the save file associated with this queue_item
-  int remove();
-
 public:
 
   // Constructor to create a new QueueItem
@@ -67,6 +64,9 @@ public:
   const unsigned char priority() const;
 
   const unsigned long push_index() const;
+
+  // Removes the save file associated with this queue_item
+  int remove();
 
 };
 
