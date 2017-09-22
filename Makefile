@@ -23,7 +23,6 @@ GTEST_FLAGS=-isystem $(GTEST_INCLUDE) -pthread -I$(INCLUDE)
 all: $(STATLIB)
 
 # make test compiles the test cases into a test executable
-# must have the googletest library installed on your machine in order for these to work
 test: $(GTEST_TARGET)
 	cd gtests && ./main_test
 	cd gtests && ./task_manager_test
