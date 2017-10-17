@@ -145,30 +145,63 @@ TEST_F(QueueTest, QueueSameItemTwiceTest) {
 }
 
 TEST_F(QueueTest, LoadInSameOrderAsEnqueuedTest) {
-  Queue queue(10, "tmp");
-  for (int i = 0; i < 10; i++) {
+  int QUEUE_SIZE = 12;
+
+  Queue queue(QUEUE_SIZE, "tmp");
+  QueueItem* queue_items[QUEUE_SIZE];
+
+  for (int i = 0; i < QUEUE_SIZE - 2; i++) {
     int priority = i < 5 ? 0 : 1;
-    QueueItem qi(priority, &sd[i], sizeof(struct sample_data));
-    queue.enqueue(&qi);
+    queue_items[i] = new QueueItem(priority, &sd[i], sizeof(struct sample_data));
+    queue.enqueue(queue_items[i]);
+    std::cout << "enqueueing: priority = " << static_cast<int>(queue_items[i]->priority()) << ", push_index = " << queue_items[i]->push_index() << ", data = " << sd[i].x << " " << sd[i].y << " " << sd[i].z << std::endl;
   }
 
-  Queue loaded_queue(10, "tmp");
-  int push_index = -1;
+  struct sample_data extra1;
+  extra1.x = -1;
+  extra1.y = -1;
+  extra1.z = -1;
+
+  struct sample_data extra2;
+  extra2.x = -2;
+  extra2.y = -2;
+  extra2.z = -2;
+
+  queue_items[QUEUE_SIZE - 2] = new QueueItem(1, &extra1, sizeof(struct sample_data));
+  queue_items[QUEUE_SIZE - 1] = new QueueItem(0, &extra2, sizeof(struct sample_data));
+
+  Queue loaded_queue(QUEUE_SIZE, "tmp");
+  std::cout << "LOADED FROM DISK" << std::endl;
+
+  loaded_queue.enqueue(queue_items[QUEUE_SIZE - 2]);
+  loaded_queue.enqueue(queue_items[QUEUE_SIZE - 1]);
+
+  std::cout << "ENQUEUEING EXTRAS..." << std::endl;
+  std::cout << "enqueueing: priority = " << static_cast<int>(queue_items[QUEUE_SIZE - 2]->priority()) << ", push_index = " << queue_items[QUEUE_SIZE - 2]->push_index() << ", data = " << extra1.x << " " << extra1.y << " " << extra1.z << std::endl;
+  std::cout << "enqueueing: priority = " << static_cast<int>(queue_items[QUEUE_SIZE - 1]->priority()) << ", push_index = " << queue_items[QUEUE_SIZE - 1]->push_index() << ", data = " << extra2.x << " " << extra2.y << " " << extra2.z << std::endl;
+
+  std::cout << "VALIDATING ORDER..." << std::endl;
+  int push_index = 0;
   int priority = INT_MAX;
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < QUEUE_SIZE; i++) {
     const QueueItem* top = loaded_queue.peek();
-    int item_priority = static_cast<int>(top->priority());
-    int item_push_index = static_cast<int>(top->push_index());
+    const unsigned char item_priority = top->priority();
+    const unsigned long item_push_index = top->push_index();
+
+    const struct sample_data* sdptr = static_cast<const struct sample_data*>(top->data());
+    std::cout << "loaded: " << "priority = " << static_cast<unsigned int>(item_priority) << ", push_index = " << item_push_index << ", data = " << sdptr->x << " " << sdptr->y << " " << sdptr->z << std::endl;
+
     EXPECT_LE(item_priority, priority);
     if (item_priority != priority) {
-      push_index = -1;
+      push_index = 0;
     }
-    EXPECT_GT(item_push_index, push_index);
+    EXPECT_GE(item_push_index, push_index);
     priority = item_priority;
     push_index = item_push_index;
     loaded_queue.dequeue();
   }
 
+  std::cout << "DONE!" << std::endl;
   system("rm -rf tmp");
 }
 

@@ -6,7 +6,7 @@ Queue::QueueItemComparator::~QueueItemComparator() { }
 
 bool Queue::QueueItemComparator::operator()(const QueueItem* a, const QueueItem* b) {
   return a->priority() == b->priority() ? 
-    (a->_push_index - _queue._push_cursor) > (b->_push_index - _queue._push_cursor) : 
+    (a->push_index() - _queue._push_cursor) > (b->push_index() - _queue._push_cursor) : 
     a->priority() < b->priority();
 }
 
@@ -53,6 +53,7 @@ Queue::Queue(const unsigned int max_len, const std::string& reconstruct_dir) :
     QueueItem * qi = new QueueItem();
     if (qi->load(*it) == 0) {
       _pqueue.push(qi);
+      _push_cursor++;
     }
   }
 }
@@ -71,8 +72,8 @@ const int Queue::enqueue(QueueItem* queue_item) {
     strm << "item is already enqueued";
     throw std::logic_error(strm.str());
   }
-  _pqueue.push(queue_item);
   int retval = queue_item->write(_reconstruct_dir, _push_cursor++);
+  _pqueue.push(queue_item);
   if (retval > 0) {
     retval = QUEUE_ERROR_WRITING_ITEM;
   }
