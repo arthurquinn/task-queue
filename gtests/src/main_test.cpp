@@ -205,6 +205,32 @@ TEST_F(QueueTest, LoadInSameOrderAsEnqueuedTest) {
   system("rm -rf tmp");
 }
 
+TEST_F(QueueTest, QueuePushCursorCorrectAfterLoad) {
+  
+  // Start with full queue
+  Queue this_queue(QUEUE_LEN, "tmp");
+  QueueItem* queue_items[QUEUE_LEN];
+  for (int i = 0; i < QUEUE_LEN; i++) {
+    queue_items[i] = new QueueItem(0, &sd[i], sizeof(struct sample_data));
+    this_queue.enqueue(queue_items[i]);
+  }
+
+  // Queue push cursor should be QUEUE_LEN
+  EXPECT_EQ(this_queue.current_push_cursor(), QUEUE_LEN);
+  this_queue.dequeue();
+  this_queue.dequeue();
+  
+  // Queue push cursor should still be QUEUE_LEN
+  EXPECT_EQ(this_queue.current_push_cursor(), QUEUE_LEN);
+
+  Queue loaded_queue(QUEUE_LEN, "tmp");
+
+  // After load push cursor should still be QUEUE_LEN even though we have QUEUE_LEN - 2 items in the queue
+  EXPECT_EQ(loaded_queue.current_push_cursor(), QUEUE_LEN);
+
+  system("rm -rf tmp");
+}
+
 }  // namespace
 
 int main(int argc, char **argv) {

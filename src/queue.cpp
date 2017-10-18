@@ -6,7 +6,7 @@ Queue::QueueItemComparator::~QueueItemComparator() { }
 
 bool Queue::QueueItemComparator::operator()(const QueueItem* a, const QueueItem* b) {
   return a->priority() == b->priority() ? 
-    (a->push_index() - _queue._push_cursor) > (b->push_index() - _queue._push_cursor) : 
+    a->push_index() > b->push_index() : 
     a->priority() < b->priority();
 }
 
@@ -45,6 +45,7 @@ Queue::Queue(const unsigned int max_len, const std::string& reconstruct_dir) :
   _pqueue(comparator)
 {
   _push_cursor = 0;
+  unsigned long _max_pc = 0;
   std::vector<std::string> qitem_files = scan_qitems();
 
   // Foreach queue_item file, try loading the saved queue_item into the queue
@@ -52,10 +53,12 @@ Queue::Queue(const unsigned int max_len, const std::string& reconstruct_dir) :
   for (it = qitem_files.begin(); it < qitem_files.end(); it++) {
     QueueItem * qi = new QueueItem();
     if (qi->load(*it) == 0) {
-      _pqueue.push(qi);
       _push_cursor++;
+      _pqueue.push(qi);
+      _max_pc = std::max(_max_pc, qi->push_index() + 1);
     }
   }
+  _push_cursor = _max_pc;
 }
 
 Queue::~Queue() {
@@ -90,6 +93,10 @@ const QueueItem* Queue::peek() const {
 
 const int Queue::size() const {
   return _pqueue.size();
+}
+
+const unsigned long Queue::current_push_cursor() const {
+  return _push_cursor;
 }
 
 QueueItem* Queue::dequeue() {

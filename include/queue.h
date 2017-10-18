@@ -63,6 +63,9 @@ public:
   // Returns the current size of the queue
   const int size() const;
 
+  // Returns the current push cursor
+  const unsigned long current_push_cursor() const;
+
   // Dequeue a QueueItem from the queue and delete its corresponding queue_item .qi file
   // throws: std::length_error if the queue is empty
   // The Queue does not delete queue_items after they are dequeued, ensure user code is deleting the queue_items
