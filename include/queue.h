@@ -17,25 +17,16 @@
 #define QUEUE_ERROR_WRITING_ITEM 2
 #define QUEUE_ERROR_REMOVING_ITEM 3
 
+struct QueueItemComparator {
+  bool operator()(const QueueItem * a, const QueueItem * b);
+};
+
+typedef std::priority_queue<QueueItem*, std::vector<QueueItem*>, QueueItemComparator> queue_t;
+
 class Queue {
-
 private:
-  class QueueItemComparator {
-    friend class Queue;
-    friend class QueueItem;
-  private:
-    const Queue& _queue;
-  public:
-    QueueItemComparator(const Queue& queue);
-    ~QueueItemComparator();
-    bool operator()(const QueueItem * a, const QueueItem * b);
-  };
-
-  typedef std::priority_queue<QueueItem*, std::vector<QueueItem*>, QueueItemComparator> queue_t;
-
   const std::string _reconstruct_dir;
   const unsigned int _max_len;
-  const QueueItemComparator comparator;
   queue_t _pqueue;
   unsigned long _push_cursor;
 

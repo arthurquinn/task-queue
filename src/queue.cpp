@@ -1,10 +1,6 @@
 #include "queue.h"
 
-Queue::QueueItemComparator::QueueItemComparator(const Queue& queue) : _queue(queue) { }
-
-Queue::QueueItemComparator::~QueueItemComparator() { }
-
-bool Queue::QueueItemComparator::operator()(const QueueItem* a, const QueueItem* b) {
+bool QueueItemComparator::operator()(const QueueItem* a, const QueueItem* b) {
   return a->priority() == b->priority() ? 
     a->push_index() > b->push_index() : 
     a->priority() < b->priority();
@@ -40,9 +36,7 @@ const std::vector<std::string> Queue::scan_qitems() const {
 
 Queue::Queue(const unsigned int max_len, const std::string& reconstruct_dir) :
   _reconstruct_dir(reconstruct_dir),
-  _max_len(max_len),
-  comparator(*this),
-  _pqueue(comparator)
+  _max_len(max_len)
 {
   _push_cursor = 0;
   unsigned long _max_pc = 0;
