@@ -216,20 +216,35 @@ TEST_F(QueueTest, QueuePushCursorCorrectAfterLoad) {
   for (int i = 0; i < QUEUE_LEN; i++) {
     queue_items[i] = new QueueItem(0, &sd[i], sizeof(struct sample_data));
     this_queue.enqueue(queue_items[i]);
+    std::cout << "enqueueing: priority = " << static_cast<int>(queue_items[i]->priority()) << ", push_index = " << queue_items[i]->push_index() << ", data = " << sd[i].x << " " << sd[i].y << " " << sd[i].z << std::endl;
   }
 
   // Queue push cursor should be QUEUE_LEN
+  std::cout << "dequeueing top 2..." << std::endl;
+  QueueItem* tmp;
   EXPECT_EQ(this_queue.current_push_cursor(), QUEUE_LEN);
-  this_queue.dequeue();
-  this_queue.dequeue();
+  tmp = this_queue.dequeue();
+  tmp->remove();
+  std::cout << "dequeueing: priority = " << static_cast<int>(tmp->priority()) << ", push_index = " << tmp->push_index() << std::endl;
+  tmp = this_queue.dequeue();
+  tmp->remove();
+  std::cout << "dequeueing: priority = " << static_cast<int>(tmp->priority()) << ", push_index = " << tmp->push_index() << std::endl;
 
   // Queue push cursor should still be QUEUE_LEN
   EXPECT_EQ(this_queue.current_push_cursor(), QUEUE_LEN);
+  std::cout << "PUSH CURSOR BEFORE LOAD: " << this_queue.current_push_cursor() << std::endl;
 
   Queue loaded_queue(QUEUE_LEN, "tmp");
 
   // After load push cursor should still be QUEUE_LEN even though we have QUEUE_LEN - 2 items in the queue
   EXPECT_EQ(loaded_queue.current_push_cursor(), QUEUE_LEN);
+
+  while (loaded_queue.size() > 0) {
+    tmp = loaded_queue.dequeue();
+    std::cout << "final queue: priority = " << static_cast<int>(tmp->priority()) << ", push_index = " << tmp->push_index() << std::endl;
+  }
+
+  std::cout << "PUSH CURSOR AFTER LOAD: " << loaded_queue.current_push_cursor() << std::endl;
 
   system("rm -rf tmp");
 }
