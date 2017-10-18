@@ -5,8 +5,10 @@
 QueueItem::QueueItem(unsigned char priority, const void * raw_data, unsigned int raw_data_len) {
   _is_enqueued = false;
   _priority = priority;
-  _raw_data = raw_data;
-  _raw_data_len = raw_data_len;
+  if (raw_data != NULL && raw_data_len > 0) {
+    _raw_data = raw_data;
+    _raw_data_len = raw_data_len;
+  }
 }
 
 QueueItem::QueueItem() {
@@ -75,16 +77,24 @@ int QueueItem::load(const std::string& save_file) {
         unsigned char * p = reinterpret_cast<unsigned char *>((memblock = memblock+sizeof(unsigned long)));
         unsigned long * pidx = reinterpret_cast<unsigned long *>((memblock = memblock+sizeof(unsigned char)));
         unsigned int * len = reinterpret_cast<unsigned int *>((memblock = memblock+sizeof(unsigned long)));
-        void * tmp_raw = reinterpret_cast<void *>((memblock = memblock+sizeof(unsigned int)));
+        void * tmp_raw;
+        if (*len > 0) {
+          tmp_raw = reinterpret_cast<void *>((memblock = memblock+sizeof(unsigned int)));
+        }
         _priority = *p;
         _push_index = *pidx;
         _raw_data_len = *len;
         _filepath = save_file;
 
         // copy raw data
-        char * raw = new char[_raw_data_len];
-        std::memcpy(raw, tmp_raw, _raw_data_len);
-        _raw_data = raw;
+        if (_raw_data_len) {
+          char * raw = new char[_raw_data_len];
+          std::memcpy(raw, tmp_raw, _raw_data_len);
+          _raw_data = raw;
+        } 
+        else {
+          _raw_data = NULL;
+        }
       } else {
         retval = 1;
       }
@@ -113,7 +123,9 @@ int QueueItem::write(const std::string& save_dir, const unsigned long push_index
       outstream.write(reinterpret_cast<const char *>(&_priority),sizeof(unsigned char));
       outstream.write(reinterpret_cast<const char *>(&push_index),sizeof(unsigned long));
       outstream.write(reinterpret_cast<const char *>(&_raw_data_len),sizeof(unsigned int));
-      outstream.write(reinterpret_cast<const char *>(_raw_data),_raw_data_len);
+      if (_raw_data != NULL && _raw_data_len > 0) {
+        outstream.write(reinterpret_cast<const char *>(_raw_data),_raw_data_len);
+      }
     } catch (const std::exception& e) {
       retval = 1;
     }
