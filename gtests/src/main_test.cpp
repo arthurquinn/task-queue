@@ -26,7 +26,8 @@ class QueueTest : public ::testing::Test {
 
   QueueTest() {
     // You can do set-up work for each test here.
-
+    system("rm -rf tmp");
+    system("rm -rf queue_item_tmp");
     system("mkdir queue_item_tmp");
 
     // set up queue
@@ -157,6 +158,8 @@ TEST_F(QueueTest, LoadInSameOrderAsEnqueuedTest) {
     std::cout << "enqueueing: priority = " << static_cast<int>(queue_items[i]->priority()) << ", push_index = " << queue_items[i]->push_index() << ", data = " << sd[i].x << " " << sd[i].y << " " << sd[i].z << std::endl;
   }
 
+  std::cout << "DONE ENQUEUEING" << std::endl;
+
   struct sample_data extra1;
   extra1.x = -1;
   extra1.y = -1;
@@ -247,6 +250,26 @@ TEST_F(QueueTest, QueueItemNullPtrGiven) {
   EXPECT_EQ(loaded_qi->priority(), 255);
 
   system("rm -rf tmp");
+}
+
+TEST_F(QueueTest, QueueItemDeleteRawDataTest) {
+  struct sample_data* this_sd = new struct sample_data();
+  this_sd->x = 10;
+  this_sd->y = 20;
+  this_sd->z = 30;
+
+  // store this_sd in queue
+  QueueItem* qi = new QueueItem(0, this_sd, sizeof(struct sample_data));
+  test_queue->enqueue(qi);
+
+  // delete our copy of this_sd
+  delete this_sd;
+
+  // get the queue item's copy of sample data and ensure values are correct
+  const struct sample_data* their_sd = reinterpret_cast<const struct sample_data*>(qi->data());
+  EXPECT_EQ(their_sd->x, 10);
+  EXPECT_EQ(their_sd->y, 20);
+  EXPECT_EQ(their_sd->z, 30);
 }
 
 }  // namespace

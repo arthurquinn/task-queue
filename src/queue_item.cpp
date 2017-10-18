@@ -6,8 +6,19 @@ QueueItem::QueueItem(unsigned char priority, const void * raw_data, unsigned int
   _is_enqueued = false;
   _priority = priority;
   if (raw_data != NULL && raw_data_len > 0) {
-    _raw_data = raw_data;
+
+    // copy raw data
+    _raw_data = new char[raw_data_len];
+    std::memcpy(_raw_data, raw_data, raw_data_len);
+
+    // store raw data len
     _raw_data_len = raw_data_len;
+  }
+  else {
+
+    // set defaults
+    _raw_data = NULL;
+    _raw_data_len = 0;
   }
 }
 
@@ -19,7 +30,8 @@ QueueItem::QueueItem() {
 }
 
 QueueItem::~QueueItem() {
-  /// TODO: raw data pointer needs to be freed, should we handle or should user code?
+  if (_raw_data != NULL && _raw_data_len > 0)
+    delete [] static_cast<char*>(_raw_data);
 }
 
 const void * QueueItem::data() const {

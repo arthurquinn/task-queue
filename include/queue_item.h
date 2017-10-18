@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
+#include <iostream>
 
 #include "utils.h"
 
@@ -23,7 +24,7 @@ private:
   friend class Queue;
 
   bool _is_enqueued;
-  const void * _raw_data;
+  void * _raw_data;
   unsigned int _raw_data_len;
   unsigned char _priority;
   unsigned long _push_index;
