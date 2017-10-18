@@ -219,7 +219,7 @@ TEST_F(QueueTest, QueuePushCursorCorrectAfterLoad) {
   EXPECT_EQ(this_queue.current_push_cursor(), QUEUE_LEN);
   this_queue.dequeue();
   this_queue.dequeue();
-  
+
   // Queue push cursor should still be QUEUE_LEN
   EXPECT_EQ(this_queue.current_push_cursor(), QUEUE_LEN);
 
@@ -227,6 +227,24 @@ TEST_F(QueueTest, QueuePushCursorCorrectAfterLoad) {
 
   // After load push cursor should still be QUEUE_LEN even though we have QUEUE_LEN - 2 items in the queue
   EXPECT_EQ(loaded_queue.current_push_cursor(), QUEUE_LEN);
+
+  system("rm -rf tmp");
+}
+
+TEST_F(QueueTest, QueueItemNullPtrGiven) {
+
+  Queue this_queue(1, "tmp");
+
+  // Enqueue a queue item with a null ptr to raw data
+  QueueItem* qi = new QueueItem(255, NULL, 0);
+  this_queue.enqueue(qi);
+
+  // Attempt to load this queue item
+  Queue loaded_queue(1, "tmp");
+  QueueItem* loaded_qi = loaded_queue.dequeue();
+
+  // Ensure queue item was loaded properly
+  EXPECT_EQ(loaded_qi->priority(), 255);
 
   system("rm -rf tmp");
 }
